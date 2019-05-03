@@ -142,6 +142,8 @@ def makeHDXEntries(start_date, **params):
                     showcase.add_tags(tags)
 
                     dataset.create_in_hdx()
+                    showcase.create_in_hdx()
+                    showcase.add_dataset(dataset)
                     logger.info('Created UNOSAT product %s here: %s' % (productID, dataset.get_hdx_url()))
 
                     with open('publishlog.txt', 'a+') as f:
