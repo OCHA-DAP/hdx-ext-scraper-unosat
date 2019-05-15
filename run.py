@@ -72,35 +72,37 @@ def makeHDXEntries(start_date, **params):
                 for unosatDBEntry in cursor:
                     if not unosatDBEntry:
                         raise UNOSATError('Empty row in db!')
+                    productID = str(unosatDBEntry['id_product'])
+                    logger.info('Processing UNOSAT product %s' % productID)
+                    logger.debug(unosatDBEntry)
                     id_area = unosatDBEntry['id_area']
                     iso3 = unosatCountryCodes[id_area]
                     product_glide = unosatDBEntry['product_glide']
-                    logger.info('product_glide = %s' % product_glide)
+                    # logger.info('product_glide = %s' % product_glide)
                     typetag = product_glide[:2]
+                    product_description = unosatDBEntry['product_description']
                     if '-' in product_glide:
                         glideiso3 = product_glide.split('-')[3]
+                        product_description = '**Glide code: %s**  %s' % (product_glide, product_description)
                     else:
                         glideiso3 = product_glide[10:13]
-                        product_glide = '%s-%s-00%s-%s' % (typetag, product_glide[2:6], product_glide[6:10], glideiso3)
+                        product_description = '**UNOSAT code: %s**  %s' % (product_glide, product_description)
 
                     if iso3 != glideiso3:
                         raise UNOSATError(
                             'UNOSAT id_area=%s, area_iso3=%s does not match glide iso3=%s' % (id_area, iso3, glideiso3))
 
-                    logger.info(unosatDBEntry)
-
                     # Dataset variables
-                    productID = str(unosatDBEntry['id_product'])
                     slugified_name = slugify(unosatDBEntry['product_title'])
                     event_type = standardEventTypesDict[typetag]
-                    tags = ['geodata', product_glide]
+                    tags = ['geodata']
                     if event_type:
                         tags.append(event_type)
 
                     dataset = Dataset({
                         'name': slugified_name,
                         'title': unosatDBEntry['product_title'],
-                        'notes': unosatDBEntry['product_description']})
+                        'notes': product_description})
                     dataset.set_maintainer('83fa9515-3ba4-4f1d-9860-f38b20f80442')
                     dataset.add_country_location(iso3)
                     dataset.add_tags(tags)
@@ -144,7 +146,6 @@ def makeHDXEntries(start_date, **params):
                     dataset.create_in_hdx()
                     showcase.create_in_hdx()
                     showcase.add_dataset(dataset)
-                    logger.info('Created UNOSAT product %s here: %s' % (productID, dataset.get_hdx_url()))
 
                     with open('publishlog.txt', 'a+') as f:
                         f.write('%s,%s\n' % (productID, dataset.get_hdx_url()))
