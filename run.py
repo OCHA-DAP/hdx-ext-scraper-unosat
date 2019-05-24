@@ -26,28 +26,31 @@ class UNOSATError(Exception):
 
 # Standard strings
 standardEventTypesDict = {
-    'CW': 'cold wave',
-    'CE': 'complex emergency',
-    'DR': 'drought',
-    'EQ': 'earthquakes',
-    'EP': 'epidemics - outbreaks',
-    'EC': 'cyclones - hurricanes - typhoons',
-    'FR': 'fires',
-    'FL': 'floods',
-    'FF': 'floods',
+    'AC': 'Accident',
+    'CW': 'Cold Wave',
+    'CE': 'Complex Emergency',
+    'DR': 'Drought',
+    'EQ': 'Earthquake',
+    'EP': 'Epidemic',
+    'EC': 'Extratropical Cyclone',
+    'FR': 'Fire',
+    'FL': 'Flood',
+    'FF': 'Flash Flood',
+    'HT': 'Heat Wave',  # ReliefWeb
+    'HW': 'Heat Wave',
     'IN': 'Insect Infestation',
-    'LS': 'landslides',
-    'MS': 'Mud Slide',
-    'OT': None,
-    'AV': 'avalanches',
-    'SS': None,
-    'AC': 'Tech. Disaster',
-    'TO': 'cyclones - hurricanes - typhoons',
-    'TC': 'cyclones - hurricanes - typhoons',
-    'TS': 'tsunamis',
-    'VW': 'cyclones - hurricanes - typhoons',
-    'VO': 'volcanos',
-    'WF': 'fires'}
+    'LS': 'Landslide',
+    'MS': 'Mudslide',
+    'OT': 'Other',
+    'AV': 'Snow Avalanche',
+    'SS': 'Storm Surge',
+    'ST': 'Severe Local Storm',
+    'TO': 'Tornado',
+    'TC': 'Tropical Cyclone',
+    'TS': 'Tsunami',
+    'VW': 'Violent Wind',
+    'VO': 'Volcano',
+    'WF': 'Wild Fire'}
 
 
 def makeHDXEntries(start_date, **params):
