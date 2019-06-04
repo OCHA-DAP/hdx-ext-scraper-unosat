@@ -95,7 +95,8 @@ def make_hdx_entries(start_date, **params):
                             'UNOSAT id_area=%s, area_iso3=%s does not match glide iso3=%s' % (id_area, iso3, glideiso3))
 
                     # Dataset variables
-                    slugified_name = slugify(unosatDBEntry['product_title'])
+                    title = unosatDBEntry['product_title']
+                    slugified_name = slugify(title[:90])
                     event_type = standardEventTypesDict[typetag]
                     tags = ['geodata']
                     if event_type:
@@ -103,7 +104,7 @@ def make_hdx_entries(start_date, **params):
 
                     dataset = Dataset({
                         'name': slugified_name,
-                        'title': unosatDBEntry['product_title'],
+                        'title': title,
                         'notes': product_description})
                     dataset.set_maintainer('83fa9515-3ba4-4f1d-9860-f38b20f80442')
                     dataset.add_country_location(iso3)
