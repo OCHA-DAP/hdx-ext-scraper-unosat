@@ -96,7 +96,11 @@ def make_hdx_entries(start_date, **params):
 
                     # Dataset variables
                     title = unosatDBEntry['product_title']
-                    slugified_name = slugify(title).replace('satellite-detected-water', 'water')[:90]
+                    slugified_name = slugify(title)
+                    if len(slugified_name) > 90:
+                        slugified_name = slugified_name.replace('satellite-detected-', '').replace('estimation-of-',
+                                                                                                   '').replace(
+                            'geodata-of-', '')[:90]
                     event_type = standardEventTypesDict[typetag]
                     tags = ['geodata']
                     if event_type:
