@@ -26,34 +26,33 @@ class UNOSATError(Exception):
 
 # Standard strings
 standardEventTypesDict = {
-    'AC': 'Accident',
-    'CW': 'Cold Wave',
-    'CE': 'Complex Emergency',
-    'DR': 'Drought',
-    'EQ': 'Earthquake',
-    'EP': 'Epidemic',
-    'EC': 'Extratropical Cyclone',
-    'FR': 'Fire',
-    'FL': 'Flood',
-    'FF': 'Flash Flood',
-    'HT': 'Heat Wave',  # ReliefWeb
-    'HW': 'Heat Wave',
-    'IN': 'Insect Infestation',
-    'LS': 'Landslide',
-    'MS': 'Mudslide',
-    'OT': 'Other',
-    'AV': 'Snow Avalanche',
-    'SS': 'Storm Surge',
-    'ST': 'Severe Local Storm',
-    'TO': 'Tornado',
-    'TC': 'Tropical Cyclone',
-    'TS': 'Tsunami',
-    'VW': 'Violent Wind',
-    'VO': 'Volcano',
-    'WF': 'Wild Fire'}
+    'AC': 'accident - technical disaster',
+    'CW': 'cold wave',
+    'CE': 'complex emergency',
+    'DR': 'drought',
+    'EQ': 'earthquake',
+    'EP': 'epidemics and outbreaks',
+    'EC': 'cyclones - hurricanes - typhoons',
+    'FR': 'fire',
+    'FL': 'flood',
+    'FF': 'flash flood',
+    'HT': 'heat wave',
+    'IN': 'insect infestation',
+    'LS': 'landslide',
+    'MS': 'mudslide',
+    'OT': None,
+    'AV': 'avalanche',
+    'SS': 'storm surge',
+    'ST': 'severe local storms',
+    'TO': 'tornado',
+    'TC': 'cyclones - hurricanes - typhoons',
+    'TS': 'tsunami',
+    'VW': 'violent wind',
+    'VO': 'volcano',
+    'WF': 'wild fire'}
 
 
-def makeHDXEntries(start_date, **params):
+def make_hdx_entries(start_date, **params):
     logger.info('Adding any datasets created or updated after %s' % start_date.date().isoformat())
 
     # Connect to the database
@@ -164,7 +163,7 @@ def main(db_params, start_date, **ignore):
         params['port'] = int(port)
     params['charset'] = 'utf8'
     params['cursorclass'] = pymysql.cursors.DictCursor
-    makeHDXEntries(start_date, **params)
+    make_hdx_entries(start_date, **params)
 
 
 if __name__ == '__main__':
