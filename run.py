@@ -6,6 +6,7 @@ from os.path import join
 import pymysql.cursors
 from dateutil.parser import parse
 from hdx.facades import logging_kwargs
+from hdx.utilities import get_uuid
 from slugify import slugify
 
 logging_kwargs['smtp_config_yaml'] = join('config', 'smtp_configuration.yml')
@@ -70,93 +71,94 @@ def make_hdx_entries(start_date, **params):
             cursor.execute(sql, (start_date, start_date))
             if not cursor.rowcount:
                 raise UNOSATError('No db results found')
-            else:
-                for unosatDBEntry in cursor:
-                    if not unosatDBEntry:
-                        raise UNOSATError('Empty row in db!')
-                    productID = str(unosatDBEntry['id_product'])
-                    logger.info('Processing UNOSAT product %s' % productID)
-                    logger.debug(unosatDBEntry)
-                    id_area = unosatDBEntry['id_area']
-                    iso3 = unosatCountryCodes[id_area]
-                    product_glide = unosatDBEntry['product_glide']
-                    # logger.info('product_glide = %s' % product_glide)
-                    typetag = product_glide[:2]
-                    product_description = unosatDBEntry['product_description']
-                    if '-' in product_glide:
-                        glideiso3 = product_glide.split('-')[3]
-                        product_description = '**Glide code: %s**  %s' % (product_glide, product_description)
-                    else:
-                        glideiso3 = product_glide[10:13]
-                        product_description = '**UNOSAT code: %s**  %s' % (product_glide, product_description)
+            batch = get_uuid()
+            for unosatDBEntry in cursor:
+                if not unosatDBEntry:
+                    raise UNOSATError('Empty row in db!')
+                productID = str(unosatDBEntry['id_product'])
+                logger.info('Processing UNOSAT product %s' % productID)
+                logger.debug(unosatDBEntry)
+                id_area = unosatDBEntry['id_area']
+                iso3 = unosatCountryCodes[id_area]
+                product_glide = unosatDBEntry['product_glide']
+                # logger.info('product_glide = %s' % product_glide)
+                typetag = product_glide[:2]
+                product_description = unosatDBEntry['product_description']
+                if '-' in product_glide:
+                    glideiso3 = product_glide.split('-')[3]
+                    product_description = '**Glide code: %s**  %s' % (product_glide, product_description)
+                else:
+                    glideiso3 = product_glide[10:13]
+                    product_description = '**UNOSAT code: %s**  %s' % (product_glide, product_description)
 
-                    if iso3 != glideiso3:
-                        raise UNOSATError(
-                            'UNOSAT id_area=%s, area_iso3=%s does not match glide iso3=%s' % (id_area, iso3, glideiso3))
+                if iso3 != glideiso3:
+                    raise UNOSATError(
+                        'UNOSAT id_area=%s, area_iso3=%s does not match glide iso3=%s' % (id_area, iso3, glideiso3))
 
-                    # Dataset variables
-                    title = unosatDBEntry['product_title']
-                    slugified_name = slugify(title)
-                    if len(slugified_name) > 90:
-                        slugified_name = slugified_name.replace('satellite-detected-', '')
-                        slugified_name = slugified_name.replace('estimation-of-', '')
-                        slugified_name = slugified_name.replace('geodata-of-', '')[:90]
-                    event_type = standardEventTypesDict[typetag]
-                    tags = ['geodata']
-                    if event_type:
-                        tags.append(event_type)
+                # Dataset variables
+                title = unosatDBEntry['product_title']
+                slugified_name = slugify(title)
+                if len(slugified_name) > 90:
+                    slugified_name = slugified_name.replace('satellite-detected-', '')
+                    slugified_name = slugified_name.replace('estimation-of-', '')
+                    slugified_name = slugified_name.replace('geodata-of-', '')[:90]
+                event_type = standardEventTypesDict[typetag]
+                tags = ['geodata']
+                if event_type:
+                    tags.append(event_type)
 
-                    dataset = Dataset({
-                        'name': slugified_name,
-                        'title': title,
-                        'notes': product_description})
-                    dataset.set_maintainer('83fa9515-3ba4-4f1d-9860-f38b20f80442')
-                    dataset.add_country_location(iso3)
-                    dataset.add_tags(tags)
-                    dataset.set_expected_update_frequency('Never')
-                    dataset.set_dataset_date_from_datetime(unosatDBEntry['product_created'])
+                dataset = Dataset({
+                    'name': slugified_name,
+                    'title': title,
+                    'notes': product_description})
+                dataset.set_maintainer('83fa9515-3ba4-4f1d-9860-f38b20f80442')
+                dataset.add_country_location(iso3)
+                dataset.add_tags(tags)
+                dataset.set_expected_update_frequency('Never')
+                dataset.set_dataset_date_from_datetime(unosatDBEntry['product_created'])
 
-                    gdb_link = unosatDBEntry['GDB_Link']
-                    bitsgdb = gdb_link.split('/')
-                    shp_link = unosatDBEntry['SHP_Link']
-                    bitsshp = shp_link.split('/')
+                gdb_link = unosatDBEntry['GDB_Link']
+                bitsgdb = gdb_link.split('/')
+                shp_link = unosatDBEntry['SHP_Link']
+                bitsshp = shp_link.split('/')
 
-                    resources = [
-                        {
-                            'name': bitsgdb[len(bitsgdb) - 1],
-                            'format': 'zipped geodatabase',
-                            'url': gdb_link,
-                            'description': 'Zipped geodatabase',
-                        },
-                        {
-                            'name': bitsshp[len(bitsshp) - 1],
-                            'format': 'zipped shapefile',
-                            'url': shp_link,
-                            'description': 'Zipped shapefile',
-                        }
-                    ]
+                resources = [
+                    {
+                        'name': bitsgdb[len(bitsgdb) - 1],
+                        'format': 'zipped geodatabase',
+                        'url': gdb_link,
+                        'description': 'Zipped geodatabase',
+                    },
+                    {
+                        'name': bitsshp[len(bitsshp) - 1],
+                        'format': 'zipped shapefile',
+                        'url': shp_link,
+                        'description': 'Zipped shapefile',
+                    }
+                ]
 
-                    dataset.add_update_resources(resources)
-                    dataset.update_from_yaml()
+                dataset.add_update_resources(resources)
+                dataset.update_from_yaml()
 
-                    showcase = Showcase({
-                        'name': '%s-showcase' % slugified_name,
-                        'title': 'Static PDF Map',
-                        'notes': 'Static viewing map for printing.',
-                        'url': 'https://unosat-maps.web.cern.ch/unosat-maps/%s/%s' % (
+                showcase = Showcase({
+                    'name': '%s-showcase' % slugified_name,
+                    'title': 'Static PDF Map',
+                    'notes': 'Static viewing map for printing.',
+                    'url': 'https://unosat-maps.web.cern.ch/unosat-maps/%s/%s' % (
                         unosatDBEntry['product_folder'], unosatDBEntry['product_url1']),
-                        'image_url': 'https://unosat-maps.web.cern.ch/unosat-maps/%s/%s' % (
+                    'image_url': 'https://unosat-maps.web.cern.ch/unosat-maps/%s/%s' % (
                         unosatDBEntry['product_folder'], unosatDBEntry['product_img'])
-                    })
-                    showcase.add_tags(tags)
+                })
+                showcase.add_tags(tags)
 
-                    dataset.create_in_hdx()
-                    showcase.create_in_hdx()
-                    showcase.add_dataset(dataset)
+                dataset.create_in_hdx(remove_additional_resources=True, hxl_update=False, updated_by_script='UNOSAT',
+                                      batch=batch)
+                showcase.create_in_hdx()
+                showcase.add_dataset(dataset)
 
-                    with open('publishlog.txt', 'a+') as f:
-                        f.write('%s,%s\n' % (productID, dataset.get_hdx_url()))
-                        f.close()
+                with open('publishlog.txt', 'a+') as f:
+                    f.write('%s,%s\n' % (productID, dataset.get_hdx_url()))
+                    f.close()
     finally:
         connection.close()
 
