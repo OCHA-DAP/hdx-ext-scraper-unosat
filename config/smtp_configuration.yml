@@ -1,4 +1,4 @@
 handlers:
   error_mail_handler:
-    toaddrs: harry.kendall@unitar.org
+    toaddrs: sami.tabbara@unitar.org
     subject: "UNOSAT-HDX-Script-Alert"

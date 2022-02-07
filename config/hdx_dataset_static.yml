@@ -7,5 +7,3 @@ methodology_other: "UNOSAT datasets and maps are produced using a variety of met
 dataset_source: "UN Operational Satellite Applications Programme (UNOSAT)"
 package_creator: "unosat"
 private: False  # has to be True or False
-url: ~
-state: "active"  # always "active".

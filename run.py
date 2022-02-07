@@ -6,7 +6,7 @@ from os.path import join
 import pymysql.cursors
 from dateutil.parser import parse
 from hdx.facades import logging_kwargs
-from hdx.utilities import get_uuid
+from hdx.utilities.uuid import get_uuid
 from slugify import slugify
 
 logging_kwargs['smtp_config_yaml'] = join('config', 'smtp_configuration.yml')
@@ -115,7 +115,7 @@ def make_hdx_entries(start_date, **params):
                 dataset.add_country_location(iso3)
                 dataset.add_tags(tags)
                 dataset.set_expected_update_frequency('Never')
-                dataset.set_dataset_date_from_datetime(unosatDBEntry['product_created'])
+                dataset.set_date_of_dataset(unosatDBEntry['product_created'])
 
                 gdb_link = unosatDBEntry['GDB_Link']
                 bitsgdb = gdb_link.split('/')
