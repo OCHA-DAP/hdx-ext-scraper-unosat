@@ -1,4 +1,0 @@
-handlers:
-  error_mail_handler:
-    toaddrs: sami.tabbara@unitar.org
-    subject: "UNOSAT-HDX-Script-Alert"

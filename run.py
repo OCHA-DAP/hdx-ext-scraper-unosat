@@ -1,15 +1,11 @@
 import argparse
 import logging
 from datetime import datetime, timedelta
-from os.path import join
 
 import pymysql.cursors
 from dateutil.parser import parse
-from hdx.facades import logging_kwargs
 from hdx.utilities.uuid import get_uuid
 from slugify import slugify
-
-logging_kwargs['smtp_config_yaml'] = join('config', 'smtp_configuration.yml')
 
 from hdx.facades.keyword_arguments import facade
 from hdx.data.showcase import Showcase
