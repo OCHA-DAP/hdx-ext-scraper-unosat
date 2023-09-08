@@ -1,5 +1,7 @@
 # Upload datasets to HDX from UNOSAT database
 
+Superceded by https://github.com/OCHA-DAP/hdx-scraper-unosat
+
 Takes command line arguments:
 
     -hk or --hdx_key: HDX api key
